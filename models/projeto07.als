@@ -1,17 +1,16 @@
 
-sig Person {
-    knows: set Person
+sig armazem{
+    drones : some drone, 
+    clientes : set cliente,
+    livros : set livro
 }
 
-
-fact noSelfKnow {
-    all p: Person | not (p in p.knows)
+sig drone{
+    livros : livro
 }
 
+sig livro{}
 
-pred example {
-    some p: Person | some p.knows
-}
+sig cliente{}
 
 
-run example for 3 Person
