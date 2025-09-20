@@ -1,6 +1,7 @@
 open util/boolean
 
-sig Armazem {
+//
+one sig Armazem {
     drones: set Drone,
     pedidos: set Pedido}
 
@@ -52,7 +53,7 @@ fact CapacidadePorCliente {
 
 fact SeNaoEstaEntregandoDeveEstarNoArmazem { // diz que se p drone não tá entregando ele tá no armazém
   all d: Drone |
-    (d.disponivel = False) iff (d in Armazem.drones)
+    (d.disponivel = True) implies (d in Armazem.drones)
 }
 
 fact SeUmDroneEstaEmUmPedidoOPedidoTemEsseDrone {
@@ -66,6 +67,47 @@ fact SeUmDroneEstaEmUmPedidoOPedidoTemEsseDrone {
     // se d tem algum pedido, então existe um pedido p com p.drone = d
     (some p: Pedido | p.drone = d) implies (one p: Pedido | p.drone = d) // confirma a relação
 }
+
+
+// 1. Deve existir pelo menos um pedido no sistema
+pred existePedido {
+    some Pedido
+}
+
+// 2. Deve existir pelo menos um cliente conveniado
+pred existeClienteConveniado {
+    some c: Cliente | c.ehConveniado = True
+}
+
+// 3. Deve existir pelo menos um cliente não conveniado
+pred existeClienteNaoConveniado {
+    some c: Cliente | c.ehConveniado = False
+}
+
+// 4. Deve existir um pedido válido de cliente conveniado (até 5 livros)
+pred pedidoConveniadoValido {
+    some p: Pedido |
+        p.cliente.ehConveniado = True and
+        #p.livros <= 5
+}
+
+// 5. Deve existir um pedido válido de cliente NÃO conveniado (até 3 livros)
+pred pedidoNaoConveniadoValido {
+    some p: Pedido |
+        p.cliente.ehConveniado = False and
+        #p.livros <= 3
+}
+
+// 6. Deve existir pelo menos um drone em entrega
+pred droneEmEntrega {
+    some p: Pedido | p.status = Enviando
+}
+
+// 7. Deve existir pelo menos um drone disponível no armazém
+pred droneNoArmazem {
+    some d: Drone | d.disponivel = True and d in Armazem.drones
+}
+
 
 
 
