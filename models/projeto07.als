@@ -122,6 +122,18 @@ assert nenhumClienteComMaisDeUmPedidoEnviando {
         #pedidosEnviando <= 1
 }
 
+fact RelacaoArmazemComPedidos { //todos os pedidos existentes tem que estar no armazem
+    Armazem.pedidos = Pedido
+}
+
+fact RelacaoArmazemComDrones { //armazem controla todos os drones
+    Armazem.drones = Drone
+}
+
+fact DroneDisponineisEstaoNoArmazem { // Se o Drone esta disponivel, esta no armazem. Se esta no armazem, esta disponivel
+    all d: Drone | (d in Armazem.drones) iff (d.disponivel = True)
+}
+
 // =========================
 // PREDICADOS PARA TESTE
 // =========================
