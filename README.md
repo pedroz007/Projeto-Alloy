@@ -1,6 +1,6 @@
 # Projeto Alloy
 
-Este repositório contém modelos Alloy (.als) para o projeto XYZ.
+Este repositório contém modelos Alloy (.als) para o projeto acadêmico de simulação de um sistema de coordenação de entrega de livros por meio de drones.
 
 ## Como rodar
 1. Instale o [VS Code](https://code.visualstudio.com/) + a extensão [Alloy](https://marketplace.visualstudio.com/items?itemName=ArashSahebolamri.alloy).
@@ -9,3 +9,4 @@ Este repositório contém modelos Alloy (.als) para o projeto XYZ.
 
 ## Estrutura
 - `models/` → arquivos principais do Alloy
+
