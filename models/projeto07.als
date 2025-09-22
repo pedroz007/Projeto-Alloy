@@ -10,7 +10,8 @@ one sig Armazem {
 }
 
 abstract sig Drone {
-    disponivel: one Bool
+    disponivel: one Bool,
+    capacidade: Int
 }
 
 sig DroneComum extends Drone {}
@@ -46,29 +47,15 @@ fact QuantidadeDeDrones {
     all d: Drone | d in DroneComum + DroneEspecial
 }
 
-// 2. Capacidade de drones
-fact CapacidadeDroneComum {
-    all p: Pedido |
-        p.drone in DroneComum implies #p.livros <= 3
-}
-
-fact CapacidadeDroneEspecial {
-    all p: Pedido |
-        p.drone in DroneEspecial implies #p.livros <= 5
-}
-
-// 3. Capacidade por cliente
 fact CapacidadePorCliente {
-    all p: Pedido |
-        (p.cliente.ehConveniado = True implies #p.livros <= 5)
-        and
-        (p.cliente.ehConveniado = False implies #p.livros <= 3)
+  all p: Pedido |
+    (p.cliente.ehConveniado = True implies #p.livros <= 5) and
+    (p.cliente.ehConveniado = False implies #p.livros <= 3)  // diz que se for conveniado tem limite de 5 livros, senão so 3
 }
 
-// 4. Se drone não está em entrega → deve estar no armazém
-fact SeNaoEstaEmEntregaDeveEstarNoArmazem {
-    all d: Drone |
-        (no p: Pedido | p.drone = d) iff (d in Armazem.drones)
+fact SeNaoEstaEntregandoDeveEstarNoArmazem { // diz que se p drone não tá entregando ele tá no armazém
+  all d: Drone |
+    (d.disponivel = True) implies (d in Armazem.drones)
 }
 
 // 5. Um pedido por cliente
@@ -105,6 +92,17 @@ fact PedidoEmEntregaNaoNoArmazem {
 // =========================
 // PREDICADOS PARA TESTE
 // =========================
+
+fact AlocacaoDrones {
+    // Pedidos pendentes não têm drone alocado
+    all p: Pedido | p.status = Pendente implies no p.drone
+    
+    // Pedidos enviando ou entregues devem ter drone alocado
+    all p: Pedido | (p.status = Enviando or p.status = Entregue) implies one p.drone
+    
+    // Cada drone pode estar alocado a no máximo um pedido ativo
+    all d: Drone | lone p: Pedido | p.drone = d and p.status != Entregue
+}
 
 pred existePedido {
     some Pedido
