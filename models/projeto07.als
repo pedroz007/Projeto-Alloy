@@ -189,10 +189,27 @@ pred droneNoArmazem {
     some d: Drone | d.disponivel = True and d in Armazem.drones
 }
 
+pred pedidoMaximo {
+    some p: Pedido | #p.livros = 5
+}
+
+pred pedidoMinimo {
+    some p: Pedido | #p.livros = 1
+}
+
+pred todosDronesDisponiveis {
+    all d: Drone | d.disponivel = True
+}
+
+pred todosDronesOcupados {
+    no d: Drone | d.disponivel = True
+}
+
 // =========================
 // RUNS
 // =========================
 
+run {} for 10
 run existePedido for 10
 run existeClienteConveniado for 10
 run existeClienteNaoConveniado for 10
@@ -200,6 +217,10 @@ run pedidoConveniadoValido for 10
 run pedidoNaoConveniadoValido for 10
 run droneEmEntrega for 10
 run droneNoArmazem for 10
+run pedidoMaximo for 10
+run pedidoMinimo for 10
+run todosDronesDisponiveis for 10
+run todosDronesOcupados for 10
 
 check nenhumClienteComMaisDeUmPedidoEnviando for 10
 
