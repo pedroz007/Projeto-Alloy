@@ -71,11 +71,31 @@ fact DroneDisponivelSemPedido {
         d not in Pedido.drone implies d.disponivel = True 
 }
 
+fact DroneDisponivelSemPedidoEmAndamento {
+    all d: Drone | all p: Pedido |
+        p.drone = d and p.status != Enviando implies d.disponivel = True
+}
+
+fact DroneComPedidoEmAndamentoIndisponivel {
+    all d: Drone | all p: Pedido |
+        p.drone = d and p.status = Enviando implies d.disponivel = False
+}
+
 fact DroneEspecialParaPedidosGrandes {
     all p: Pedido |
         #p.livros > 3 implies p.drone in DroneEspecial
 }
- 
+
+fact DroneEspecialApenasParaClientesConveniados {
+    all p: Pedido |
+        p.drone in DroneEspecial implies p.cliente.ehConveniado = True
+}
+
+fact DroneComumParaClientesNaoConveniados {
+    all p: Pedido |
+        p.cliente.ehConveniado = False implies p.drone in DroneComum
+}
+
 fact ClienteSoPodePedirSeDroneDisponivel {
     all c: Cliente |
         some d: Drone | d.disponivel = True implies
@@ -104,7 +124,6 @@ fact DronesComApenasUmPedido {
     all d: Drone | lone p: Pedido | p.drone = d and p.status != Entregue
 }
 
-// Um pedido tem apenas UM cliente ligado a ele
 fact UmPedidoEhFeitoPorApenasUmCliente {
     all p: Pedido | 
         one c: Cliente | p.cliente = c and p in c.pedidos 
@@ -115,23 +134,28 @@ fact PedidoEhApontadoPorUmCliente {
         lone c: Cliente | p in c.pedidos
 }
 
-// assertion para verificar se um cliente tem apenas um pedido com status de Enviando por vez
+fact RelacaoArmazemPedidos {
+    Armazem.pedidos = Pedido
+}
+
+fact DroneDisponiveisNoArmazem {
+    all d: Drone | (d in Armazem.drones) iff (d.disponivel = True)
+}
+
+
+// =========================
+// ASSERTS
+// =========================
+
 assert nenhumClienteComMaisDeUmPedidoEnviando {
     all c: Cliente |
         let pedidosEnviando = c.pedidos & { p: Pedido | p.status = Enviando } |
         #pedidosEnviando <= 1
 }
 
-fact RelacaoArmazemComPedidos { //todos os pedidos existentes tem que estar no armazem
-    Armazem.pedidos = Pedido
-}
-
-fact RelacaoArmazemComDrones { //armazem controla todos os drones
-    Armazem.drones = Drone
-}
-
-fact DroneDisponineisEstaoNoArmazem { // Se o Drone esta disponivel, esta no armazem. Se esta no armazem, esta disponivel
-    all d: Drone | (d in Armazem.drones) iff (d.disponivel = True)
+assert nenhumDroneIndisponivelNoArmazem {
+    all d: Drone | all p: Pedido |
+        p.drone = d and p.status = Enviando implies d not in Armazem.drones
 }
 
 // =========================
@@ -170,10 +194,27 @@ pred droneNoArmazem {
     some d: Drone | d.disponivel = True and d in Armazem.drones
 }
 
+pred pedidoMaximo {
+    some p: Pedido | #p.livros = 5
+}
+
+pred pedidoMinimo {
+    some p: Pedido | #p.livros = 1
+}
+
+pred todosDronesDisponiveis {
+    all d: Drone | d.disponivel = True
+}
+
+pred todosDronesOcupados {
+    no d: Drone | d.disponivel = True
+}
+
 // =========================
 // RUNS
 // =========================
 
+run {} for 10
 run existePedido for 10
 run existeClienteConveniado for 10
 run existeClienteNaoConveniado for 10
@@ -181,8 +222,10 @@ run pedidoConveniadoValido for 10
 run pedidoNaoConveniadoValido for 10
 run droneEmEntrega for 10
 run droneNoArmazem for 10
+run pedidoMaximo for 10
+run pedidoMinimo for 10
+run todosDronesDisponiveis for 10
+run todosDronesOcupados for 10
 
 check nenhumClienteComMaisDeUmPedidoEnviando for 10
-
-
-
+check nenhumDroneIndisponivelNoArmazem for 10
