@@ -71,11 +71,31 @@ fact DroneDisponivelSemPedido {
         d not in Pedido.drone implies d.disponivel = True 
 }
 
+fact DroneDisponivelSemPedidoEmAndamento {
+    all d: Drone | all p: Pedido |
+        p.drone = d and p.status != Enviando implies d.disponivel = True
+}
+
+fact DroneComPedidoEmAndamentoIndisponivel {
+    all d: Drone | all p: Pedido |
+        p.drone = d and p.status = Enviando implies d.disponivel = False
+}
+
 fact DroneEspecialParaPedidosGrandes {
     all p: Pedido |
         #p.livros > 3 implies p.drone in DroneEspecial
 }
- 
+
+fact DroneEspecialApenasParaClientesConveniados {
+    all p: Pedido |
+        p.drone in DroneEspecial implies p.cliente.ehConveniado = True
+}
+
+fact DroneComumParaClientesNaoConveniados {
+    all p: Pedido |
+        p.cliente.ehConveniado = False implies p.drone in DroneComum
+}
+
 fact ClienteSoPodePedirSeDroneDisponivel {
     all c: Cliente |
         some d: Drone | d.disponivel = True implies
@@ -104,7 +124,6 @@ fact DronesComApenasUmPedido {
     all d: Drone | lone p: Pedido | p.drone = d and p.status != Entregue
 }
 
-// Um pedido tem apenas UM cliente ligado a ele
 fact UmPedidoEhFeitoPorApenasUmCliente {
     all p: Pedido | 
         one c: Cliente | p.cliente = c and p in c.pedidos 
@@ -115,7 +134,19 @@ fact PedidoEhApontadoPorUmCliente {
         lone c: Cliente | p in c.pedidos
 }
 
-// assertion para verificar se um cliente tem apenas um pedido com status de Enviando por vez
+fact RelacaoArmazemPedidos {
+    Armazem.pedidos = Pedido
+}
+
+fact DroneDisponiveisNoArmazem {
+    all d: Drone | (d in Armazem.drones) iff (d.disponivel = True)
+}
+
+
+// =========================
+// ASSERTS
+// =========================
+
 assert nenhumClienteComMaisDeUmPedidoEnviando {
     all c: Cliente |
         let pedidosEnviando = c.pedidos & { p: Pedido | p.status = Enviando } |
