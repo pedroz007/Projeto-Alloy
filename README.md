@@ -9,4 +9,3 @@ Este repositório contém modelos Alloy (.als) para o projeto XYZ.
 
 ## Estrutura
 - `models/` → arquivos principais do Alloy
-- `docs/`   → relatórios, prints, explicações
