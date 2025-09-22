@@ -48,10 +48,10 @@ fact QuantidadeDeDrones {
 fact CapacidadePorCliente {
   all p: Pedido |
     (p.cliente.ehConveniado = True implies #p.livros <= 5) and
-    (p.cliente.ehConveniado = False implies #p.livros <= 3)  // diz que se for conveniado tem limite de 5 livros, senão so 3
+    (p.cliente.ehConveniado = False implies #p.livros <= 3)
 }
 
-fact SeNaoEstaEntregandoDeveEstarNoArmazem { // diz que se p drone não tá entregando ele tá no armazém
+fact SeNaoEstaEntregandoDeveEstarNoArmazem {
   all d: Drone |
     (d.disponivel = True) implies (d in Armazem.drones)
 }
