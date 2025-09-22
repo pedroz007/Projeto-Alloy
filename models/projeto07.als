@@ -17,9 +17,9 @@ sig DroneComum extends Drone {}
 sig DroneEspecial extends Drone {}
 
 abstract sig Status {}
-sig Pendente extends Status {}
-sig Enviando extends Status {}
-sig Entregue extends Status {}
+one sig Pendente extends Status {}
+one sig Enviando extends Status {}
+one sig Entregue extends Status {}
 
 sig Livro {}
 
