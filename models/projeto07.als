@@ -17,9 +17,9 @@ sig DroneComum extends Drone {}
 sig DroneEspecial extends Drone {}
 
 abstract sig Status {}
-sig Pendente extends Status {}
-sig Enviando extends Status {}
-sig Entregue extends Status {}
+one sig Pendente extends Status {}
+one sig Enviando extends Status {}
+one sig Entregue extends Status {}
 
 sig Livro {}
 
@@ -39,7 +39,6 @@ sig Pedido {
 // FACTS
 // =========================
 
-// 1. Quantidade de drones
 fact QuantidadeDeDrones {
     #DroneComum = 3
     #DroneEspecial = 2
@@ -49,53 +48,59 @@ fact QuantidadeDeDrones {
 fact CapacidadePorCliente {
   all p: Pedido |
     (p.cliente.ehConveniado = True implies #p.livros <= 5) and
-    (p.cliente.ehConveniado = False implies #p.livros <= 3)  // diz que se for conveniado tem limite de 5 livros, senão so 3
+    (p.cliente.ehConveniado = False implies #p.livros <= 3)
 }
 
-fact SeNaoEstaEntregandoDeveEstarNoArmazem { // diz que se p drone não tá entregando ele tá no armazém
+fact SeNaoEstaEntregandoDeveEstarNoArmazem {
   all d: Drone |
     (d.disponivel = True) implies (d in Armazem.drones)
 }
 
-// 5. Um pedido por cliente
 fact UmPedidoPorCliente {
     all c: Cliente |
         lone p: Pedido | p.cliente = c
 }
 
-// 6. Um pedido por drone
 fact UmPedidoPorDrone {
     all d: Drone |
         lone p: Pedido | p.drone = d
 }
 
-// 7. Pedidos de mais de 3 livros usam DroneEspecial
+fact DroneDisponivelSemPedido {
+    all d: Drone |
+        d not in Pedido.drone implies d.disponivel = True 
+}
+
 fact DroneEspecialParaPedidosGrandes {
     all p: Pedido |
         #p.livros > 3 implies p.drone in DroneEspecial
 }
-
-// 8. Cliente só pode fazer pedido se houver drone disponível
+ 
 fact ClienteSoPodePedirSeDroneDisponivel {
     all c: Cliente |
         some d: Drone | d.disponivel = True implies
         lone p: Pedido | p.cliente = c
 }
 
-// 9. Pedido em andamento → drone não está no armazém
 fact PedidoEmEntregaNaoNoArmazem {
     all p: Pedido |
         p.status = Enviando implies p.drone not in Armazem.drones
 }
 
-fact AlocacaoDrones {
-    // Pedidos pendentes não têm drone alocado
+fact PedidoMinimo {
+    all p: Pedido |
+        #p.livros >= 1
+}
+
+fact PedidosPendentesSemDrone {
     all p: Pedido | p.status = Pendente implies no p.drone
-    
-    // Pedidos enviando ou entregues devem ter drone alocado
+}
+
+fact PedidosEmEnvioComDrone {
     all p: Pedido | (p.status = Enviando or p.status = Entregue) implies one p.drone
-    
-    // Cada drone pode estar alocado a no máximo um pedido ativo
+}
+
+fact DronesComApenasUmPedido {
     all d: Drone | lone p: Pedido | p.drone = d and p.status != Entregue
 }
 
