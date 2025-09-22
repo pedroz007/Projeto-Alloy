@@ -104,6 +104,10 @@ fact UmPedidoEhFeitoPorApenasUmCliente {
     all p: Pedido | one p.cliente
 }
 
+fact UmPedidoApontaParaUmClienteEOClienteApontaParaOPedido {
+    all p: Pedido | p in Armazem.pedidos iff p.cliente in Cliente and p in Pedido
+}
+
 // =========================
 // PREDICADOS PARA TESTE
 // =========================
