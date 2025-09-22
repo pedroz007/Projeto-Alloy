@@ -66,6 +66,11 @@ fact UmPedidoPorDrone {
         lone p: Pedido | p.drone = d
 }
 
+fact DroneDisponivelSemPedido {
+    all d: Drone |
+        d not in Pedido.drone implies d.disponivel = True 
+}
+
 fact DroneEspecialParaPedidosGrandes {
     all p: Pedido |
         #p.livros > 3 implies p.drone in DroneEspecial
