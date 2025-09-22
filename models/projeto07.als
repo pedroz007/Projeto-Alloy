@@ -147,8 +147,3 @@ run pedidoConveniadoValido for 10
 run pedidoNaoConveniadoValido for 10
 run droneEmEntrega for 10
 run droneNoArmazem for 10
-
-
-
-
-
