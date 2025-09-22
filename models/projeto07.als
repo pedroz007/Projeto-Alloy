@@ -11,7 +11,6 @@ one sig Armazem {
 
 abstract sig Drone {
     disponivel: one Bool,
-    capacidade: Int
 }
 
 sig DroneComum extends Drone {}
@@ -89,10 +88,6 @@ fact PedidoEmEntregaNaoNoArmazem {
         p.status = Enviando implies p.drone not in Armazem.drones
 }
 
-// =========================
-// PREDICADOS PARA TESTE
-// =========================
-
 fact AlocacaoDrones {
     // Pedidos pendentes não têm drone alocado
     all p: Pedido | p.status = Pendente implies no p.drone
@@ -103,6 +98,10 @@ fact AlocacaoDrones {
     // Cada drone pode estar alocado a no máximo um pedido ativo
     all d: Drone | lone p: Pedido | p.drone = d and p.status != Entregue
 }
+
+// =========================
+// PREDICADOS PARA TESTE
+// =========================
 
 pred existePedido {
     some Pedido
