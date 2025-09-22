@@ -99,6 +99,11 @@ fact AlocacaoDrones {
     all d: Drone | lone p: Pedido | p.drone = d and p.status != Entregue
 }
 
+// Um pedido tem apenas um cliente ligado a ele
+fact UmPedidoEhFeitoPorApenasUmCliente {
+    all p: Pedido | one p.cliente
+}
+
 // =========================
 // PREDICADOS PARA TESTE
 // =========================
