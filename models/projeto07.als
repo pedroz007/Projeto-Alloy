@@ -153,6 +153,11 @@ assert nenhumClienteComMaisDeUmPedidoEnviando {
         #pedidosEnviando <= 1
 }
 
+assert nenhumDroneIndisponivelNoArmazem {
+    all d: Drone | all p: Pedido |
+        p.drone = d and p.status = Enviando implies d not in Armazem.drones
+}
+
 // =========================
 // PREDICADOS PARA TESTE
 // =========================
@@ -223,6 +228,4 @@ run todosDronesDisponiveis for 10
 run todosDronesOcupados for 10
 
 check nenhumClienteComMaisDeUmPedidoEnviando for 10
-
-
-
+check nenhumDroneIndisponivelNoArmazem for 10
