@@ -45,17 +45,44 @@ fact QuantidadeDeDrones {
     all d: Drone | d in DroneComum + DroneEspecial
 }
 
+fact CapacidadeDroneComum {
+    all p: Pedido |
+            p.drone in DroneComum implies #p.livros <= 3
+}
+
+fact CapacidadeDroneEspecial {
+    all p: Pedido |
+            p.drone in DroneEspecial implies #p.livros <= 5
+}
+
 fact CapacidadePorCliente {
   all p: Pedido |
-    (p.cliente.ehConveniado = True implies #p.livros <= 5) and
-    (p.cliente.ehConveniado = False implies #p.livros <= 3)  // diz que se for conveniado tem limite de 5 livros, senão so 3
+    (p.cliente.ehConveniado = True implies #p.livros <= 5)
+    and
+    (p.cliente.ehConveniado = False implies #p.livros <= 3)
 }
 
-fact SeNaoEstaEntregandoDeveEstarNoArmazem { // diz que se p drone não tá entregando ele tá no armazém
+
+fact SeNaoEstaEntregandoDeveEstarNoArmazem {
   all d: Drone |
-    (d.disponivel = True) implies (d in Armazem.drones)
+    (no p: Pedido | p.drone = d) iff (d in Armazem.drones)
 }
 
+fact PedidoAssociadoAoArmazem { // corrigir, conflitando com o anterior
+  all p: Pedido | p.drone in Armazem.drones
+}
+
+fact UmPedidoPorCliente {
+    all c:Cliente |
+        lone p: Pedido | p.cliente = c
+}
+
+fact UmPedidoPorDrone {
+  all d: Drone |
+    lone p: Pedido | p.drone = d
+}
+
+/*
 fact SeUmDroneEstaEmUmPedidoOPedidoTemEsseDrone {
   // Se um pedido tem um drone, então esse drone está ocupado com esse pedido.
   all p: Pedido | some p.drone implies
@@ -67,7 +94,7 @@ fact SeUmDroneEstaEmUmPedidoOPedidoTemEsseDrone {
     // se d tem algum pedido, então existe um pedido p com p.drone = d
     (some p: Pedido | p.drone = d) implies (one p: Pedido | p.drone = d) // confirma a relação
 }
-
+*/
 
 // 1. Deve existir pelo menos um pedido no sistema
 pred existePedido {
@@ -107,6 +134,15 @@ pred droneEmEntrega {
 pred droneNoArmazem {
     some d: Drone | d.disponivel = True and d in Armazem.drones
 }
+
+run existePedido for 10
+run existeClienteConveniado for 10
+run existeClienteNaoConveniado for 10
+run pedidoConveniadoValido for 10
+run pedidoNaoConveniadoValido for 10
+run droneEmEntrega for 10
+run droneNoArmazem for 10
+
 
 
 
