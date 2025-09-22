@@ -99,6 +99,24 @@ fact AlocacaoDrones {
     all d: Drone | lone p: Pedido | p.drone = d and p.status != Entregue
 }
 
+// Um pedido tem apenas UM cliente ligado a ele
+fact UmPedidoEhFeitoPorApenasUmCliente {
+    all p: Pedido | 
+        one c: Cliente | p.cliente = c and p in c.pedidos 
+}
+
+fact PedidoEhApontadoPorUmCliente {
+    all p: Pedido |
+        lone c: Cliente | p in c.pedidos
+}
+
+// assertion para verificar se um cliente tem apenas um pedido com status de Enviando por vez
+assert nenhumClienteComMaisDeUmPedidoEnviando {
+    all c: Cliente |
+        let pedidosEnviando = c.pedidos & { p: Pedido | p.status = Enviando } |
+        #pedidosEnviando <= 1
+}
+
 // =========================
 // PREDICADOS PARA TESTE
 // =========================
@@ -147,7 +165,7 @@ run pedidoNaoConveniadoValido for 10
 run droneEmEntrega for 10
 run droneNoArmazem for 10
 
-
+check nenhumClienteComMaisDeUmPedidoEnviando for 10
 
 
 
