@@ -75,7 +75,7 @@ fact DroneEspecialParaPedidosGrandes {
     all p: Pedido |
         #p.livros > 3 implies p.drone in DroneEspecial
 }
-
+ 
 fact ClienteSoPodePedirSeDroneDisponivel {
     all c: Cliente |
         some d: Drone | d.disponivel = True implies
