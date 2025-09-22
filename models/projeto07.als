@@ -88,6 +88,12 @@ fact PedidoEmEntregaNaoNoArmazem {
         p.status = Enviando implies p.drone not in Armazem.drones
 }
 
+// 10. Pedidos têm um mínimo de 1 livro
+fact PedidoMinimo {
+    all p: Pedido |
+        #p.livros >= 1
+}
+
 fact AlocacaoDrones {
     // Pedidos pendentes não têm drone alocado
     all p: Pedido | p.status = Pendente implies no p.drone
